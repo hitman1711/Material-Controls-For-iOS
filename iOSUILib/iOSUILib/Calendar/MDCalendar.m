@@ -97,7 +97,7 @@
 - (void)initialize {
   _showPlaceholder = NO;
   _titleFont = [UIFontHelper robotoFontOfSize:15];
-  _titleMonthFont = [UIFontHelper robotoFontWithName:@"roboto-bold" size:15];
+  _titleMonthFont = [UIFontHelper robotoFontWithName:@"CoreSansDS55Bold" size:15];
   [self initThemeColors];
   _theme = -1;
   _isDoingLayoutSubview = NO;
@@ -297,48 +297,49 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-  if (indexPath.item == 0) {
+  if (indexPath.item >= 0 && indexPath.item <= 6) {
     UICollectionViewCell *cell =
-        [collectionView dequeueReusableCellWithReuseIdentifier:@"month"
+        [collectionView dequeueReusableCellWithReuseIdentifier:@"week"//@"month"
                                                   forIndexPath:indexPath];
 
-    UILabel *titleLabel = (UILabel *)[cell viewWithTag:100];
-    if (!titleLabel) {
-      titleLabel = [[UILabel alloc]
-          initWithFrame:CGRectMake(0, 0, self.mdWidth, cell.mdHeight)];
-      titleLabel.tag = 100;
-      titleLabel.textAlignment = NSTextAlignmentCenter;
-      [titleLabel setFont:_titleMonthFont];
-      [titleLabel setTextColor:_titleColors[@(MDCalendarCellStateMonthTitle)]];
-      [cell.contentView addSubview:titleLabel];
-    }
-    // titleLabel.mdWidth = self.mdWidth;
-    _dateHeader.dateFormatter.dateFormat = @"MMMM yyyy";
-    titleLabel.text = [_dateHeader.dateFormatter
-        stringFromDate:[self.minimumDate
-                           mdDateByAddingMonths:indexPath.section]];
+      UILabel *titleLabel = (UILabel *)[cell viewWithTag:110];
+      if (!titleLabel) {
+          titleLabel = [[UILabel alloc] initWithFrame:cell.contentView.bounds];
+          titleLabel.frame = cell.contentView.bounds;
+          titleLabel.tag = 110;
+          [titleLabel setTextColor:_titleColors[@(MDCalendarCellStateWeekTitle)]];
+          titleLabel.textAlignment = NSTextAlignmentCenter;
+          [cell.contentView addSubview:titleLabel];
+      }
+      titleLabel.font = self.titleFont;
+      // titleLabel.text = [NSString stringWithFormat:@"W%li", indexPath.item];
+      titleLabel.text =
+      [_weekdays objectAtIndex:(indexPath.item + _firstWeekday - 1) % 7];
+      
+
 
     return cell;
-  } else if (indexPath.item >= 7 && indexPath.item <= 13) {
+  } else if (indexPath.item == 7){//(indexPath.item >= 7 && indexPath.item <= 13) {
     UICollectionViewCell *cell =
-        [collectionView dequeueReusableCellWithReuseIdentifier:@"week"
+        [collectionView dequeueReusableCellWithReuseIdentifier:@"month"//@"week"
                                                   forIndexPath:indexPath];
-
-    UILabel *titleLabel = (UILabel *)[cell viewWithTag:110];
-    if (!titleLabel) {
-      titleLabel = [[UILabel alloc] initWithFrame:cell.contentView.bounds];
-      titleLabel.frame = cell.contentView.bounds;
-      titleLabel.tag = 110;
-      [titleLabel setTextColor:_titleColors[@(MDCalendarCellStateWeekTitle)]];
-      titleLabel.textAlignment = NSTextAlignmentCenter;
-      [cell.contentView addSubview:titleLabel];
-    }
-    titleLabel.font = self.titleFont;
-    // titleLabel.text = [NSString stringWithFormat:@"W%li", indexPath.item];
-    titleLabel.text =
-        [_weekdays objectAtIndex:(indexPath.item - 7 + _firstWeekday - 1) % 7];
-
-    return cell;
+      
+      UILabel *titleLabel = (UILabel *)[cell viewWithTag:100];
+      if (!titleLabel) {
+          titleLabel = [[UILabel alloc]
+                        initWithFrame:CGRectMake(0, 0, self.mdWidth, cell.mdHeight)];
+          titleLabel.tag = 100;
+          titleLabel.textAlignment = NSTextAlignmentCenter;
+          [titleLabel setFont:_titleMonthFont];
+          [titleLabel setTextColor:_titleColors[@(MDCalendarCellStateMonthTitle)]];
+          [cell.contentView addSubview:titleLabel];
+      }
+      // titleLabel.mdWidth = self.mdWidth;
+      _dateHeader.dateFormatter.dateFormat = @"LLLL";
+      titleLabel.text = [[_dateHeader.dateFormatter
+                          stringFromDate:[self.minimumDate
+                                          mdDateByAddingMonths:indexPath.section]] uppercaseString];
+       return cell;
   } else {
     MDCalendarCell *cell =
         [collectionView dequeueReusableCellWithReuseIdentifier:@"cell"
@@ -358,36 +359,36 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView
-    didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-  if (indexPath.item >= 0 && indexPath.item <= 6) {
-    return; // do nothing - month title
-  } else if (indexPath.item >= 7 && indexPath.item <= 13) {
-    // week title
-    NSIndexPath *newIndexPath =
-        [NSIndexPath indexPathForItem:(indexPath.item + 7)
+didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.item >= 0 && indexPath.item <= 6) {
+        // week title
+        NSIndexPath *newIndexPath =
+        [NSIndexPath indexPathForItem:(indexPath.item + 7+7)
                             inSection:indexPath.section];
-    [_collectionView selectItemAtIndexPath:newIndexPath
-                                  animated:NO
-                            scrollPosition:UICollectionViewScrollPositionNone];
-    [self collectionView:_collectionView didSelectItemAtIndexPath:newIndexPath];
-
-  } else {
-    MDCalendarCell *cell =
+        [_collectionView selectItemAtIndexPath:newIndexPath
+                                      animated:NO
+                                scrollPosition:UICollectionViewScrollPositionNone];
+        [self collectionView:_collectionView didSelectItemAtIndexPath:newIndexPath];
+        
+    } else if (indexPath.item >= 7 && indexPath.item <= 13) {
+        return; // do nothing - month title
+    }  else {
+        MDCalendarCell *cell =
         (MDCalendarCell *)[collectionView cellForItemAtIndexPath:indexPath];
-    if (cell.isPlaceholder) {
-      indexPath = [self indexPathForDate:_selectedDate];
-      cell =
-          (MDCalendarCell *)[collectionView cellForItemAtIndexPath:indexPath];
-      [_collectionView
-          selectItemAtIndexPath:indexPath
-                       animated:NO
-                 scrollPosition:UICollectionViewScrollPositionNone];
+        if (cell.isPlaceholder) {
+            indexPath = [self indexPathForDate:_selectedDate];
+            cell =
+            (MDCalendarCell *)[collectionView cellForItemAtIndexPath:indexPath];
+            [_collectionView
+             selectItemAtIndexPath:indexPath
+             animated:NO
+             scrollPosition:UICollectionViewScrollPositionNone];
+        }
+        NSDate *date = [self dateForIndexPath:indexPath];
+        [cell showAnimation];
+        _selectedDate = date;
+        [self didSelectDate:_selectedDate];
     }
-    NSDate *date = [self dateForIndexPath:indexPath];
-    [cell showAnimation];
-    _selectedDate = date;
-    [self didSelectDate:_selectedDate];
-  }
 }
 
 - (BOOL)collectionView:(UICollectionView *)collectionView
