@@ -25,6 +25,8 @@
 NS_ASSUME_NONNULL_BEGIN
 @interface MDCalendarCell : UICollectionViewCell
 
+@property(strong,nonatomic) UIView *separator;
+
 @property(weak, nonatomic) NSDictionary <NSNumber*, UIColor*>* titleColors;
 @property(weak, nonatomic) NSDictionary <NSNumber*, UIColor*>* backgroundColors;
 

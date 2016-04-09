@@ -45,6 +45,10 @@
 - (instancetype)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
   if (self) {
+      _separator = [UIView new];
+      [_separator setBackgroundColor:[UIColor colorWithRed:166./255. green:166./255. blue:166./255. alpha:0.6]];
+      [self.contentView addSubview:_separator];
+      
     UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     titleLabel.textAlignment = NSTextAlignmentCenter;
@@ -64,6 +68,7 @@
 
 - (void)setBounds:(CGRect)bounds {
   [super setBounds:bounds];
+    [_separator setFrame:CGRectMake(-2, 0, self.bounds.size.width+5, 1)];
   CGFloat titleHeight = self.bounds.size.height * 5.0 / 6.0;
   CGFloat diameter = MIN(titleHeight, self.bounds.size.width);
   diameter = diameter * 1.6;

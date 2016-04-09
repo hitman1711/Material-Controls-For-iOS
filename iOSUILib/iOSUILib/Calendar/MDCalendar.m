@@ -297,7 +297,9 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    
   if (indexPath.item >= 0 && indexPath.item <= 6) {
+      
     UICollectionViewCell *cell =
         [collectionView dequeueReusableCellWithReuseIdentifier:@"week"//@"month"
                                                   forIndexPath:indexPath];
@@ -341,36 +343,59 @@
                                           mdDateByAddingMonths:indexPath.section]] uppercaseString];
        return cell;
   } else {
+      
     MDCalendarCell *cell =
         [collectionView dequeueReusableCellWithReuseIdentifier:@"cell"
                                                   forIndexPath:indexPath];
     // NSLog(@"cellForItemAtIndexPath %li", indexPath.item);
 
+    NSDate *currentDate = [self dateForIndexPath:indexPath];
+      
     cell.titleColors = self.titleColors;
     cell.backgroundColors = self.backgroundColors;
     cell.cellStyle = self.cellStyle;
     cell.month = [self.minimumDate mdDateByAddingMonths:indexPath.section];
     cell.currentDate = self.currentDate;
     cell.titleLabel.font = _titleFont;
-    cell.date = [self dateForIndexPath:indexPath];
+    cell.date = currentDate;
     cell.showPlaceholder = _showPlaceholder;
+      
     return cell;
   }
 }
 
+-(void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
+    
+    if ([cell isMemberOfClass:[MDCalendarCell class]]) {
+        MDCalendarCell* cCell = (MDCalendarCell*)cell;
+        
+         NSDate *currentDate = [self dateForIndexPath:indexPath];
+          NSDateComponents *currentComponents = [[NSCalendar currentCalendar] components: NSCalendarUnitMonth  fromDate:currentDate];
+          NSDateComponents *monthComponents = [[NSCalendar currentCalendar] components: NSCalendarUnitMonth  fromDate:cCell.month];
+          NSInteger currentMonth = [currentComponents month];
+          NSInteger mMonth = [monthComponents month];
+          if (currentMonth!=mMonth) {
+              [cCell.separator setHidden:YES];
+          } else {
+              [cCell.separator setHidden:NO];
+          }
+    }
+}
+
 - (void)collectionView:(UICollectionView *)collectionView
-didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    
     if (indexPath.item >= 0 && indexPath.item <= 6) {
         // week title
         NSIndexPath *newIndexPath =
-        [NSIndexPath indexPathForItem:(indexPath.item + 7+7)
+        [NSIndexPath indexPathForItem:(indexPath.item + 7)
                             inSection:indexPath.section];
         [_collectionView selectItemAtIndexPath:newIndexPath
                                       animated:NO
                                 scrollPosition:UICollectionViewScrollPositionNone];
         [self collectionView:_collectionView didSelectItemAtIndexPath:newIndexPath];
         
-    } else if (indexPath.item >= 7 && indexPath.item <= 13) {
+    } else if (indexPath.item >= 8 && indexPath.item <= 14) {
         return; // do nothing - month title
     }  else {
         MDCalendarCell *cell =
@@ -395,7 +420,9 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     shouldSelectItemAtIndexPath:(nonnull NSIndexPath *)indexPath;
 {
   NSDate *date = [self dateForIndexPath:indexPath];
-  return [self shouldSelectDate:date];
+    BOOL shouldSelect = [self shouldSelectDate:date];
+    NSLog(@"Should select:%@\n?:%i",date,shouldSelect);
+    return shouldSelect;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView
