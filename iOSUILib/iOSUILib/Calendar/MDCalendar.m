@@ -170,7 +170,7 @@
       [NSMutableDictionary dictionaryWithCapacity:5];
   backgroundColorsLight[@(MDCalendarCellStateNormal)] = [UIColor clearColor];
   backgroundColorsLight[@(MDCalendarCellStateSelected)] =
-      [UIColorHelper colorWithRGBA:@"#009688"];
+    [UIColorHelper colorWithRGBA:@"#253e8e"];//@"#009688"];
   backgroundColorsLight[@(MDCalendarCellStateDisabled)] = [UIColor clearColor];
   backgroundColorsLight[@(MDCalendarCellStatePlaceholder)] =
       [UIColor clearColor];
