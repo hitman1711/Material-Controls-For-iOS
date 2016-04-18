@@ -56,12 +56,12 @@
 
     _labelMonthName = [[UILabel alloc] initWithFrame:CGRectZero];
     _labelMonthName.textAlignment = NSTextAlignmentCenter;
-    _labelMonthName.font = [UIFontHelper robotoFontOfSize:25];
+    _labelMonthName.font = [UIFontHelper robotoFontOfSize:15];
     [_labelMonthName setTextColor:_textColor];
     [_labelMonthName setBackgroundColor:[UIColor clearColor]];
 
-    fontDatePortrait = [UIFontHelper robotoFontOfSize:55];
-    fontDateLandscape = [UIFontHelper robotoFontOfSize:75];
+    fontDatePortrait = [UIFontHelper robotoFontOfSize:20];
+    fontDateLandscape = [UIFontHelper robotoFontOfSize:35];
 
     _labelDate = [[UILabel alloc] initWithFrame:CGRectZero];
     _labelDate.textAlignment = NSTextAlignmentCenter;
@@ -71,7 +71,7 @@
 
     _labelYear = [[UILabel alloc] initWithFrame:CGRectZero];
     _labelYear.textAlignment = NSTextAlignmentCenter;
-    _labelYear.font = [UIFontHelper robotoFontOfSize:25];
+    _labelYear.font = [UIFontHelper robotoFontOfSize:15];
     [_labelYear setBackgroundColor:[UIColor clearColor]];
     _labelYear.textColor = [_textColor colorWithAlphaComponent:0.5];
 

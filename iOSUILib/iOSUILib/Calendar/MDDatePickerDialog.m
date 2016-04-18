@@ -73,7 +73,9 @@
         initWithFrame:CGRectMake(0, 0, popupHolder.mdWidth,
                                  kCalendarHeaderHeight)];
     [popupHolder addSubview:_header];
-
+      
+      NSLog(@"CHEIGHT:%f",popupHolder.mdHeight - kCalendarHeaderHeight -
+            kCalendarActionBarHeight);
     MDCalendar *calendar = [[MDCalendar alloc]
         initWithFrame:CGRectMake(0, kCalendarHeaderHeight, popupHolder.mdWidth,
                                  popupHolder.mdHeight - kCalendarHeaderHeight -

@@ -30,6 +30,8 @@
 #import "UIColorHelper.h"
 #import "UIFontHelper.h"
 #import "UIView+MDExtension.h"
+#import "MDCalendarCustomFlowLayout.h"
+
 
 @interface MDCalendar (DataSourceAndDelegate)
 
@@ -60,6 +62,8 @@
 
 @property(nonatomic, assign) BOOL hadRemoveObserver;
 @property(nonatomic) BOOL isDoingLayoutSubview;
+
+@property (nonatomic) CGFloat scrollStartY;
 
 - (void)initThemeColors;
 
@@ -107,12 +111,7 @@
 
   _firstWeekday = [[NSCalendarHelper mdSharedCalendar] firstWeekday];
 
-  UICollectionViewFlowLayout *collectionViewFlowLayout =
-      [[UICollectionViewFlowLayout alloc] init];
-  collectionViewFlowLayout.scrollDirection =
-      UICollectionViewScrollDirectionVertical;
-  collectionViewFlowLayout.minimumInteritemSpacing = 0;
-  collectionViewFlowLayout.minimumLineSpacing = 0;
+    MDCalendarCustomFlowLayout *collectionViewFlowLayout = [[MDCalendarCustomFlowLayout alloc] init];
   self.collectionViewFlowLayout = collectionViewFlowLayout;
 
   UICollectionView *collectionView =
@@ -122,7 +121,7 @@
   collectionView.delegate = self;
   collectionView.backgroundColor = [UIColor clearColor];
   collectionView.bounces = YES;
-  collectionView.pagingEnabled = YES;
+    collectionView.pagingEnabled =  NO; //YES;
   collectionView.showsHorizontalScrollIndicator = NO;
   collectionView.showsVerticalScrollIndicator = NO;
   collectionView.delaysContentTouches = NO;
@@ -164,59 +163,85 @@
 }
 
 - (void)initThemeColors {
-  _backgroundThemeColors = [NSMutableDictionary dictionaryWithCapacity:2];
-
-  NSMutableDictionary *backgroundColorsLight =
-      [NSMutableDictionary dictionaryWithCapacity:5];
-  backgroundColorsLight[@(MDCalendarCellStateNormal)] = [UIColor clearColor];
-  backgroundColorsLight[@(MDCalendarCellStateSelected)] =
-    [UIColorHelper colorWithRGBA:@"#253e8e"];//@"#009688"];
-  backgroundColorsLight[@(MDCalendarCellStateDisabled)] = [UIColor clearColor];
-  backgroundColorsLight[@(MDCalendarCellStatePlaceholder)] =
-      [UIColor clearColor];
-  backgroundColorsLight[@(MDCalendarCellStateToday)] = [UIColor clearColor];
-
-  NSMutableDictionary *backgroundColorsDark =
-      [NSMutableDictionary dictionaryWithCapacity:5];
-  backgroundColorsDark[@(MDCalendarCellStateNormal)] =
-      [UIColorHelper colorWithRGBA:@"#263238"];
-  backgroundColorsDark[@(MDCalendarCellStateSelected)] =
-      [UIColorHelper colorWithRGBA:@"#80deea"];
-  backgroundColorsDark[@(MDCalendarCellStateDisabled)] = [UIColor clearColor];
-  backgroundColorsDark[@(MDCalendarCellStatePlaceholder)] =
-      [UIColor clearColor];
-  backgroundColorsDark[@(MDCalendarCellStateToday)] = [UIColor clearColor];
-
-  _backgroundThemeColors[@(MDCalendarThemeLight)] = backgroundColorsLight;
-  _backgroundThemeColors[@(MDCalendarThemeDark)] = backgroundColorsDark;
-
-  NSMutableDictionary *titleColorsLight =
-      [NSMutableDictionary dictionaryWithCapacity:8];
-  titleColorsLight[@(MDCalendarCellStateNormal)] = [UIColor darkTextColor];
-  titleColorsLight[@(MDCalendarCellStateSelected)] = [UIColor whiteColor];
-  titleColorsLight[@(MDCalendarCellStateDisabled)] = [UIColor clearColor];
-  titleColorsLight[@(MDCalendarCellStatePlaceholder)] = [UIColor clearColor];
-  titleColorsLight[@(MDCalendarCellStateToday)] =
-      [UIColorHelper colorWithRGBA:@"#009284"];
-  titleColorsLight[@(MDCalendarCellStateWeekTitle)] = [UIColor lightGrayColor];
-  titleColorsLight[@(MDCalendarCellStateMonthTitle)] = [UIColor blackColor];
-  titleColorsLight[@(MDCalendarCellStateButton)] = [UIColor blackColor];
-
-  NSMutableDictionary *titleColorsDark =
-      [NSMutableDictionary dictionaryWithCapacity:8];
-  titleColorsDark[@(MDCalendarCellStateNormal)] = [UIColor whiteColor];
-  titleColorsDark[@(MDCalendarCellStateSelected)] = [UIColor whiteColor];
-  titleColorsDark[@(MDCalendarCellStateDisabled)] = [UIColor clearColor];
-  titleColorsDark[@(MDCalendarCellStatePlaceholder)] = [UIColor clearColor];
-  titleColorsDark[@(MDCalendarCellStateToday)] =
-      [UIColorHelper colorWithRGBA:@"#80deea"];
-  titleColorsDark[@(MDCalendarCellStateWeekTitle)] = [UIColor lightGrayColor];
-  titleColorsDark[@(MDCalendarCellStateMonthTitle)] = [UIColor whiteColor];
-  titleColorsDark[@(MDCalendarCellStateButton)] = [UIColor whiteColor];
-
-  _titleThemeColors = [NSMutableDictionary dictionaryWithCapacity:2];
-  _titleThemeColors[@(MDCalendarThemeLight)] = titleColorsLight;
-  _titleThemeColors[@(MDCalendarThemeDark)] = titleColorsDark;
+    _backgroundThemeColors = [NSMutableDictionary dictionaryWithCapacity:3];//2
+    
+    
+    NSMutableDictionary *backgroundColorsLight =
+    [NSMutableDictionary dictionaryWithCapacity:5];
+    backgroundColorsLight[@(MDCalendarCellStateNormal)] = [UIColor clearColor];
+    backgroundColorsLight[@(MDCalendarCellStateSelected)] =
+    [UIColorHelper colorWithRGBA:@"#009688"];
+    backgroundColorsLight[@(MDCalendarCellStateDisabled)] = [UIColor clearColor];
+    backgroundColorsLight[@(MDCalendarCellStatePlaceholder)] =
+    [UIColor clearColor];
+    backgroundColorsLight[@(MDCalendarCellStateToday)] = [UIColor clearColor];
+    
+    NSMutableDictionary *backgroundColorsDark =
+    [NSMutableDictionary dictionaryWithCapacity:5];
+    backgroundColorsDark[@(MDCalendarCellStateNormal)] =
+    [UIColorHelper colorWithRGBA:@"#263238"];
+    backgroundColorsDark[@(MDCalendarCellStateSelected)] =
+    [UIColorHelper colorWithRGBA:@"#80deea"];
+    backgroundColorsDark[@(MDCalendarCellStateDisabled)] = [UIColor clearColor];
+    backgroundColorsDark[@(MDCalendarCellStatePlaceholder)] =
+    [UIColor clearColor];
+    backgroundColorsDark[@(MDCalendarCellStateToday)] = [UIColor clearColor];
+    
+    
+    NSMutableDictionary *backgroundColorsCustom = [NSMutableDictionary dictionaryWithCapacity:5];
+    backgroundColorsCustom[@(MDCalendarCellStateNormal)] = [UIColor clearColor];
+    backgroundColorsCustom[@(MDCalendarCellStateSelected)] =
+    [UIColorHelper colorWithRGBA:@"#253e8e"];
+    backgroundColorsCustom[@(MDCalendarCellStateDisabled)] = [UIColor clearColor];
+    backgroundColorsCustom[@(MDCalendarCellStatePlaceholder)] =
+    [UIColor clearColor];
+    backgroundColorsCustom[@(MDCalendarCellStateToday)] = [UIColor clearColor];
+    //backgroundColorsCustom[@(MDCalendarCellStateWeekend)] = [UIColor redColor];
+    
+    
+    _backgroundThemeColors[@(MDCalendarThemeLight)] = backgroundColorsLight;
+    _backgroundThemeColors[@(MDCalendarThemeDark)] = backgroundColorsDark;
+    _backgroundThemeColors[@(MDCalendarThemeCustom)] = backgroundColorsCustom;
+    
+    
+    NSMutableDictionary *titleColorsLight =
+    [NSMutableDictionary dictionaryWithCapacity:8];
+    titleColorsLight[@(MDCalendarCellStateNormal)] = [UIColor darkTextColor];
+    titleColorsLight[@(MDCalendarCellStateSelected)] = [UIColor whiteColor];
+    titleColorsLight[@(MDCalendarCellStateDisabled)] = [UIColor clearColor];
+    titleColorsLight[@(MDCalendarCellStatePlaceholder)] = [UIColor clearColor];
+    titleColorsLight[@(MDCalendarCellStateToday)] =
+    [UIColorHelper colorWithRGBA:@"#009284"];
+    titleColorsLight[@(MDCalendarCellStateWeekTitle)] = [UIColor lightGrayColor];
+    titleColorsLight[@(MDCalendarCellStateMonthTitle)] = [UIColor blackColor];
+    titleColorsLight[@(MDCalendarCellStateButton)] = [UIColor blackColor];
+    
+    NSMutableDictionary *titleColorsDark =
+    [NSMutableDictionary dictionaryWithCapacity:8];
+    titleColorsDark[@(MDCalendarCellStateNormal)] = [UIColor whiteColor];
+    titleColorsDark[@(MDCalendarCellStateSelected)] = [UIColor whiteColor];
+    titleColorsDark[@(MDCalendarCellStateDisabled)] = [UIColor clearColor];
+    titleColorsDark[@(MDCalendarCellStatePlaceholder)] = [UIColor clearColor];
+    titleColorsDark[@(MDCalendarCellStateToday)] =
+    [UIColorHelper colorWithRGBA:@"#80deea"];
+    titleColorsDark[@(MDCalendarCellStateWeekTitle)] = [UIColor lightGrayColor];
+    titleColorsDark[@(MDCalendarCellStateMonthTitle)] = [UIColor whiteColor];
+    titleColorsDark[@(MDCalendarCellStateButton)] = [UIColor whiteColor];
+    
+    NSMutableDictionary *titleColorsCustom =
+    [NSMutableDictionary dictionaryWithCapacity:8];
+    titleColorsCustom[@(MDCalendarCellStateNormal)] = [UIColorHelper colorWithRGBA:@"#333333"];    titleColorsCustom[@(MDCalendarCellStateSelected)] = [UIColor whiteColor];
+    titleColorsCustom[@(MDCalendarCellStateDisabled)] = [UIColor clearColor];
+    titleColorsCustom[@(MDCalendarCellStatePlaceholder)] = [UIColor clearColor];
+    titleColorsCustom[@(MDCalendarCellStateToday)] =
+    [UIColorHelper colorWithRGBA:@"#009284"];
+    titleColorsCustom[@(MDCalendarCellStateWeekTitle)] = [UIColorHelper colorWithRGBA:@"#1e1e1e"];    titleColorsCustom[@(MDCalendarCellStateMonthTitle)] = [UIColorHelper colorWithRGBA:@"#1c1c1c"];    titleColorsCustom[@(MDCalendarCellStateButton)] = [UIColor blackColor];
+    titleColorsCustom[@(MDCalendarCellStateWeekend)] = [UIColorHelper colorWithRGBA:@"#e674a7"];
+    
+    _titleThemeColors = [NSMutableDictionary dictionaryWithCapacity:3];//2
+    _titleThemeColors[@(MDCalendarThemeLight)] = titleColorsLight;
+    _titleThemeColors[@(MDCalendarThemeDark)] = titleColorsDark;
+    _titleThemeColors[@(MDCalendarThemeCustom)] = titleColorsCustom;
 }
 
 - (void)setTheme:(MDCalendarTheme)theme {
@@ -229,6 +254,8 @@
       bgColor = [UIColorHelper colorWithRGBA:@"#263238"];
     } else if (_theme == MDCalendarThemeLight) {
       bgColor = [UIColor whiteColor];
+    } else if (_theme == MDCalendarThemeCustom) {
+        bgColor = [UIColor whiteColor];
     }
 
     [self setBackgroundColor:bgColor];
@@ -253,9 +280,12 @@
   [super layoutSubviews];
   CGFloat padding = MIN(self.mdHeight * 0.01, self.mdWidth * 0.01);
   _collectionView.frame = CGRectMake(0, 0, self.mdWidth, self.mdHeight);
-  _collectionViewFlowLayout.itemSize =
-      CGSizeMake((_collectionView.mdWidth - padding * 8) / 7,
-                 (_collectionView.mdHeight - padding * 2) / 8);
+    _collectionViewFlowLayout.itemSize = CGSizeMake((_collectionView.mdWidth - padding * 8) / 7,
+                                                   (_collectionView.mdHeight - padding * 2) / 8);//52
+
+//      CGSizeMake((_collectionView.mdWidth - padding * 8) / 7,
+//                 (_collectionView.mdHeight - padding * 2) / 7);
+    //  was divided by 8
   _collectionViewFlowLayout.sectionInset =
       UIEdgeInsetsMake(padding, 0, padding, 0);
 
@@ -265,6 +295,9 @@
   [self.yearSelector relayout];
 
   _dateHeader.dateFormatter.dateFormat = @"dd-MM-yyyy";
+  NSInteger montnsFrom = [_currentDate mdMonthsFrom:self.minimumDate] + 1;
+//    [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:montnsFrom] atScrollPosition:UICollectionViewScrollPositionCenteredVertically animated:NO];
+    
   [self scrollToDate:currentDate];
   _isDoingLayoutSubview = NO;
 }
@@ -298,87 +331,94 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     
-  if (indexPath.item >= 0 && indexPath.item <= 6) {
-      
-    UICollectionViewCell *cell =
+    if (indexPath.item >= 0 && indexPath.item <= 6) {
+        
+        UICollectionViewCell *cell =
         [collectionView dequeueReusableCellWithReuseIdentifier:@"week"//@"month"
                                                   forIndexPath:indexPath];
-
-      UILabel *titleLabel = (UILabel *)[cell viewWithTag:110];
-      if (!titleLabel) {
-          titleLabel = [[UILabel alloc] initWithFrame:cell.contentView.bounds];
-          titleLabel.frame = cell.contentView.bounds;
-          titleLabel.tag = 110;
-          [titleLabel setTextColor:_titleColors[@(MDCalendarCellStateWeekTitle)]];
-          titleLabel.textAlignment = NSTextAlignmentCenter;
-          [cell.contentView addSubview:titleLabel];
-      }
-      titleLabel.font = self.titleFont;
-      // titleLabel.text = [NSString stringWithFormat:@"W%li", indexPath.item];
-      titleLabel.text =
-      [_weekdays objectAtIndex:(indexPath.item + _firstWeekday - 1) % 7];
-      
-
-
-    return cell;
-  } else if (indexPath.item == 7){//(indexPath.item >= 7 && indexPath.item <= 13) {
-    UICollectionViewCell *cell =
+        
+        UILabel *titleLabel = (UILabel *)[cell viewWithTag:110];
+        if (!titleLabel) {
+            titleLabel = [[UILabel alloc] initWithFrame:cell.contentView.bounds];
+            titleLabel.frame = cell.contentView.bounds;
+            titleLabel.tag = 110;
+            
+            [titleLabel setTextColor:_titleColors[@(MDCalendarCellStateWeekTitle)]];
+            titleLabel.textAlignment = NSTextAlignmentCenter;
+            [cell.contentView addSubview:titleLabel];
+        }
+        titleLabel.font = self.titleFont;
+        // titleLabel.text = [NSString stringWithFormat:@"W%li", indexPath.item];
+        titleLabel.text =
+        [_weekdays objectAtIndex:(indexPath.item + _firstWeekday - 1) % 7];
+        
+        return cell;
+    } else if (indexPath.item == 7){//(indexPath.item >= 7 && indexPath.item <= 13) {
+        UICollectionViewCell *cell =
         [collectionView dequeueReusableCellWithReuseIdentifier:@"month"//@"week"
                                                   forIndexPath:indexPath];
-      
-      UILabel *titleLabel = (UILabel *)[cell viewWithTag:100];
-      if (!titleLabel) {
-          titleLabel = [[UILabel alloc]
-                        initWithFrame:CGRectMake(0, 0, self.mdWidth, cell.mdHeight)];
-          titleLabel.tag = 100;
-          titleLabel.textAlignment = NSTextAlignmentCenter;
-          [titleLabel setFont:_titleMonthFont];
-          [titleLabel setTextColor:_titleColors[@(MDCalendarCellStateMonthTitle)]];
-          [cell.contentView addSubview:titleLabel];
-      }
-      // titleLabel.mdWidth = self.mdWidth;
-      _dateHeader.dateFormatter.dateFormat = @"LLLL";
-      titleLabel.text = [[_dateHeader.dateFormatter
-                          stringFromDate:[self.minimumDate
-                                          mdDateByAddingMonths:indexPath.section]] uppercaseString];
-       return cell;
-  } else {
-      
-    MDCalendarCell *cell =
+        
+        UILabel *titleLabel = (UILabel *)[cell viewWithTag:100];
+        if (!titleLabel) {
+            titleLabel = [[UILabel alloc]
+                          initWithFrame:CGRectMake(0, 0, self.mdWidth, cell.mdHeight)];
+            titleLabel.tag = 100;
+            titleLabel.textAlignment = NSTextAlignmentCenter;
+            [titleLabel setFont:_titleMonthFont];
+            [titleLabel setTextColor:_titleColors[@(MDCalendarCellStateMonthTitle)]];
+            [cell.contentView addSubview:titleLabel];
+        }
+        // titleLabel.mdWidth = self.mdWidth;
+        _dateHeader.dateFormatter.dateFormat = @"LLLL";
+        titleLabel.text = [[_dateHeader.dateFormatter
+                            stringFromDate:[self.minimumDate
+                                            mdDateByAddingMonths:indexPath.section]] uppercaseString];
+        return cell;
+    } else {//if (indexPath.item > 7) {
+        
+        MDCalendarCell *cell =
         [collectionView dequeueReusableCellWithReuseIdentifier:@"cell"
                                                   forIndexPath:indexPath];
-    // NSLog(@"cellForItemAtIndexPath %li", indexPath.item);
-
-    NSDate *currentDate = [self dateForIndexPath:indexPath];
-      
-    cell.titleColors = self.titleColors;
-    cell.backgroundColors = self.backgroundColors;
-    cell.cellStyle = self.cellStyle;
-    cell.month = [self.minimumDate mdDateByAddingMonths:indexPath.section];
-    cell.currentDate = self.currentDate;
-    cell.titleLabel.font = _titleFont;
-    cell.date = currentDate;
-    cell.showPlaceholder = _showPlaceholder;
-      
-    return cell;
-  }
+        // NSLog(@"cellForItemAtIndexPath %li", indexPath.item);
+        
+        NSDate *currentDate = [self dateForIndexPath:indexPath];
+        
+        cell.titleColors = self.titleColors;
+        cell.backgroundColors = self.backgroundColors;
+        cell.cellStyle = self.cellStyle;
+        cell.month = [self.minimumDate mdDateByAddingMonths:indexPath.section];
+        cell.currentDate = self.currentDate;
+        cell.titleLabel.font = _titleFont;
+        cell.date = currentDate;
+        cell.showPlaceholder = _showPlaceholder;
+        
+        return cell;
+        
+    }
 }
 
 -(void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     
-    if ([cell isMemberOfClass:[MDCalendarCell class]]) {
+    if (indexPath.item >= 0 && indexPath.item <= 6) {
+        
+        UILabel *titleLabel = [cell viewWithTag:110];
+        MDCalendarCellState colorCellState = indexPath.item >=5 ? MDCalendarCellStateWeekend : MDCalendarCellStateWeekTitle;
+        [titleLabel setTextColor:_titleColors[@(colorCellState)]];
+        
+    } else if (indexPath.item > 7) {
+        
         MDCalendarCell* cCell = (MDCalendarCell*)cell;
         
-         NSDate *currentDate = [self dateForIndexPath:indexPath];
-          NSDateComponents *currentComponents = [[NSCalendar currentCalendar] components: NSCalendarUnitMonth  fromDate:currentDate];
-          NSDateComponents *monthComponents = [[NSCalendar currentCalendar] components: NSCalendarUnitMonth  fromDate:cCell.month];
-          NSInteger currentMonth = [currentComponents month];
-          NSInteger mMonth = [monthComponents month];
-          if (currentMonth!=mMonth) {
-              [cCell.separator setHidden:YES];
-          } else {
-              [cCell.separator setHidden:NO];
-          }
+        NSDate *currentDate = [self dateForIndexPath:indexPath];
+        NSDateComponents *currentComponents = [[NSCalendar currentCalendar] components: NSCalendarUnitMonth  fromDate:currentDate];
+        NSDateComponents *monthComponents = [[NSCalendar currentCalendar] components: NSCalendarUnitMonth  fromDate:cCell.month];
+        NSInteger currentMonth = [currentComponents month];
+        NSInteger mMonth = [monthComponents month];
+        if (currentMonth!=mMonth) {
+            [cCell.separator setHidden:YES];
+        } else {
+            [cCell.separator setHidden:NO];
+        }
     }
 }
 
@@ -439,8 +479,11 @@
   if (_isDoingLayoutSubview) {
     return;
   }
-  CGFloat scrollOffset = MAX(scrollView.contentOffset.x / scrollView.mdWidth,
-                             scrollView.contentOffset.y / scrollView.mdHeight);
+    CGFloat scrollOffset =MAX(scrollView.contentOffset.x / scrollView.mdWidth,
+                         scrollView.contentOffset.y / ((56/7)*50));
+
+    //MAX(scrollView.contentOffset.x / scrollView.mdWidth,
+    //                         scrollView.contentOffset.y / scrollView.mdHeight);
 
   NSDate *currentMonth =
       [self.minimumDate mdDateByAddingMonths:round(scrollOffset)];
@@ -449,6 +492,52 @@
     //[self currentMonthDidChange];
   }
 }
+
+//-(void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset{
+//    
+//}
+//- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
+//    NSLog(@"BEGIN Y:%f",scrollView.contentOffset.y);
+//    _scrollStartY = scrollView.contentOffset.y;
+//}
+//
+//- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
+//    
+//    NSLog(@"SV VELOCITY Y:%f",velocity.y);
+//   // *targetContentOffset = //scrollView.contentOffset; // set acceleration to 0.0
+////    float pageWidth = (float)371.;
+////    int minSpace = 10;
+////    BOOL isDownDirection = targetContentOffset.y > scrollView.contentOffset.y;
+////    int sectionToSwipe = (scrollView.contentOffset.y)/pageWidth + 0.5; // cell width + min spacing for lines
+////    if (sectionToSwipe < 0) {
+////        cellToSwipe = 0;
+////    } else if (cellToSwipe >= self.articles.count) {
+////        cellToSwipe = self.articles.count - 1;
+////    }
+////    [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:cellToSwipe inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+//}
+//
+//- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate{
+//    NSLog(@"END Y:%f isDec:%i",scrollView.contentOffset.y, decelerate);
+//    CGFloat diff = scrollView.contentOffset.y - _scrollStartY;
+//    if (diff==0)
+//        return;
+//
+//    BOOL isDownDirection = diff>0 ? NO : YES;
+//    NSDate *toDate = isDownDirection ? [self.currentDate mdDateBySubtractingMonths:1] : [self.currentDate mdDateByAddingMonths:1];
+//    [self scrollToDate:toDate];
+////   
+////    CGFloat scrollOffset =MAX(scrollView.contentOffset.x / scrollView.mdWidth,
+////                              scrollView.contentOffset.y / 371.);
+////    
+////    NSDate *currentMonth =
+////    [self.minimumDate mdDateByAddingMonths:round(scrollOffset)];
+////    if (![_currentMonth mdIsEqualToDateForMonth:currentMonth]) {
+////        _currentMonth = [currentMonth copy];
+////        //[self currentMonthDidChange];
+////    }
+//    
+//}
 
 #pragma mark - Setter & Getter
 
@@ -522,13 +611,16 @@
       [_collectionView indexPathsForSelectedItems].lastObject;
   [self reloadData:selectedPath];
 }
+
 #pragma mark - Private
 
 - (void)scrollToDate:(NSDate *)date {
   NSInteger scrollOffset = [date mdMonthsFrom:self.minimumDate];
-  _collectionView.bounds =
-      CGRectMake(0, scrollOffset * _collectionView.mdHeight,
-                 _collectionView.mdWidth, _collectionView.mdHeight);
+  NSIndexPath *idxPath = [NSIndexPath indexPathForItem:0 inSection:scrollOffset];
+    [_collectionView scrollToItemAtIndexPath:idxPath atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+//  _collectionView.bounds =
+//      CGRectMake(0, scrollOffset * _collectionView.mdHeight,
+//                 _collectionView.mdWidth, _collectionView.mdHeight);
 }
 
 - (NSDate *)dateForIndexPath:(NSIndexPath *)indexPath {

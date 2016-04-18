@@ -45,7 +45,8 @@ typedef NS_OPTIONS(NSInteger, MDCalendarCellState) {
 
 typedef NS_ENUM(NSInteger, MDCalendarTheme) {
   MDCalendarThemeLight = 1,
-  MDCalendarThemeDark = 2
+  MDCalendarThemeDark = 2,
+  MDCalendarThemeCustom = 3
 };
 
 NS_ASSUME_NONNULL_BEGIN

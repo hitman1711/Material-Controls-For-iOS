@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		75B16F211CC585D2002F4CE6 /* MDCalendarCustomFlowLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 75B16F201CC585D2002F4CE6 /* MDCalendarCustomFlowLayout.m */; };
 		8807F0F81B09C6A4001C0D0B /* TabContentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8807F0F61B09C6A4001C0D0B /* TabContentViewController.m */; };
 		8807F0F91B09C6A4001C0D0B /* TabContentViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8807F0F71B09C6A4001C0D0B /* TabContentViewController.xib */; };
 		8824326D1B0993C900A2B17C /* TabBarViewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8824326B1B0993C900A2B17C /* TabBarViewControllerViewController.m */; };
@@ -116,6 +117,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		75B16F1F1CC585D2002F4CE6 /* MDCalendarCustomFlowLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDCalendarCustomFlowLayout.h; sourceTree = "<group>"; };
+		75B16F201CC585D2002F4CE6 /* MDCalendarCustomFlowLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MDCalendarCustomFlowLayout.m; sourceTree = "<group>"; };
 		8807F0F51B09C6A4001C0D0B /* TabContentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TabContentViewController.h; sourceTree = "<group>"; };
 		8807F0F61B09C6A4001C0D0B /* TabContentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TabContentViewController.m; sourceTree = "<group>"; };
 		8807F0F71B09C6A4001C0D0B /* TabContentViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TabContentViewController.xib; sourceTree = "<group>"; };
@@ -329,6 +332,8 @@
 		889FB56A1C55DBA6006D110B /* Calendar */ = {
 			isa = PBXGroup;
 			children = (
+				75B16F1F1CC585D2002F4CE6 /* MDCalendarCustomFlowLayout.h */,
+				75B16F201CC585D2002F4CE6 /* MDCalendarCustomFlowLayout.m */,
 				889FB5541C55DBA6006D110B /* MDCalendar.h */,
 				889FB5551C55DBA6006D110B /* MDCalendar.m */,
 				889FB5561C55DBA6006D110B /* MDCalendarCell.h */,
@@ -607,7 +612,6 @@
 				TargetAttributes = {
 					88D8DE5D1A7A16E700D083A1 = {
 						CreatedOnToolsVersion = 6.1.1;
-						DevelopmentTeam = 854MF4G8EF;
 					};
 				};
 			};
@@ -711,6 +715,7 @@
 				922AC50D1BE753F300C0C2A1 /* FloatingButtonToolbarViewController.m in Sources */,
 				889FB5AD1C55DBA6006D110B /* MDCalendarCell.m in Sources */,
 				928026C31AD37C9500DFF739 /* CollectionViewController.m in Sources */,
+				75B16F211CC585D2002F4CE6 /* MDCalendarCustomFlowLayout.m in Sources */,
 				889FB5BA1C55DBA6006D110B /* UIColorHelper.m in Sources */,
 				889FB5C91C55DBA6006D110B /* MDTouchGestureRecognizer.m in Sources */,
 				889FB5B01C55DBA6006D110B /* MDCalendarYearSelector.m in Sources */,

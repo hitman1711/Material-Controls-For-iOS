@@ -25,9 +25,27 @@
 #import "UIView+MDExtension.h"
 #import "MDCalendarDateHeader.h"
 
-#define kHeaderHeight 190
+#define IS_IPAD (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+#define IS_IPHONE (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) // iPhone and       iPod touch style UI
+
+#define IS_IPAD (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+#define IS_IPHONE (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+#define IS_RETINA ([[UIScreen mainScreen] scale] >= 2.0)
+
+#define SCREEN_WIDTH ([[UIScreen mainScreen] bounds].size.width)
+#define SCREEN_HEIGHT ([[UIScreen mainScreen] bounds].size.height)
+#define SCREEN_MAX_LENGTH (MAX(SCREEN_WIDTH, SCREEN_HEIGHT))
+#define SCREEN_MIN_LENGTH (MIN(SCREEN_WIDTH, SCREEN_HEIGHT))
+
+#define IS_IPHONE_4_OR_LESS (IS_IPHONE && SCREEN_MAX_LENGTH < 568.0)
+#define IS_IPHONE_5 (IS_IPHONE && SCREEN_MAX_LENGTH == 568.0)
+#define IS_IPHONE_6 (IS_IPHONE && SCREEN_MAX_LENGTH == 667.0)
+#define IS_IPHONE_6P (IS_IPHONE && SCREEN_MAX_LENGTH == 736.0)
+
 
 @interface MDDatePicker ()
+
+@property(nonatomic) NSNumber *headerHeight;
 @property(nonatomic) MDCalendarDateHeader *header;
 @property(nonatomic) MDCalendar *calendar;
 @end
@@ -51,18 +69,23 @@
 }
 
 - (void)setupContent {
+    CGFloat tableHeight = 470;
+    NSNumber *freeSpace = @([[UIScreen mainScreen] bounds].size.height - tableHeight);
+    _headerHeight = @0;//freeSpace>0 ? freeSpace : @1;
+    //IS_IPHONE_6 ? @190. : IS_IPHONE_5 ? @90. : @20.;
   _header = [[MDCalendarDateHeader alloc]
-      initWithFrame:CGRectMake(0, 0, self.mdWidth, kHeaderHeight)];
+      initWithFrame:CGRectMake(0, 0, self.mdWidth, _headerHeight.floatValue)];
   [self addSubview:_header];
-
+    
+    NSLog(@"CHEIGHT:%f",self.mdHeight - _headerHeight.floatValue);
   MDCalendar *calendar = [[MDCalendar alloc]
-      initWithFrame:CGRectMake(0, kHeaderHeight, self.mdWidth,
-                               self.mdHeight - kHeaderHeight)];
+      initWithFrame:CGRectMake(0, _headerHeight.floatValue, self.mdWidth,
+                               self.mdHeight - _headerHeight.floatValue)];
   calendar.dateHeader = _header;
   [self addSubview:calendar];
   self.calendar = calendar;
 
-  self.calendar.theme = MDCalendarThemeLight;
+  self.calendar.theme = MDCalendarThemeCustom;//MDCalendarThemeLight;
 
   [self setBackgroundColor:self.calendar.backgroundColor];
 }
@@ -74,9 +97,9 @@
   case UIInterfaceOrientationPortrait:
   case UIInterfaceOrientationPortraitUpsideDown: {
     // load the portrait view
-    _header.frame = CGRectMake(0, 0, self.mdWidth, kHeaderHeight);
-    _calendar.frame = CGRectMake(0, kHeaderHeight, self.mdWidth,
-                                 self.mdHeight - kHeaderHeight);
+    _header.frame = CGRectMake(0, 0, self.mdWidth, _headerHeight.floatValue);
+    _calendar.frame = CGRectMake(0, _headerHeight.floatValue, self.mdWidth,
+                                 self.mdHeight - _headerHeight.floatValue);
   }
 
   break;
