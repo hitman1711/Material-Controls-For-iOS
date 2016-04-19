@@ -71,13 +71,12 @@
 - (void)setupContent {
     CGFloat tableHeight = 470;
     NSNumber *freeSpace = @([[UIScreen mainScreen] bounds].size.height - tableHeight);
-    _headerHeight = @0;//freeSpace>0 ? freeSpace : @1;
+    _headerHeight = freeSpace>0 ? freeSpace : @1;
     //IS_IPHONE_6 ? @190. : IS_IPHONE_5 ? @90. : @20.;
   _header = [[MDCalendarDateHeader alloc]
       initWithFrame:CGRectMake(0, 0, self.mdWidth, _headerHeight.floatValue)];
   [self addSubview:_header];
     
-    NSLog(@"CHEIGHT:%f",self.mdHeight - _headerHeight.floatValue);
   MDCalendar *calendar = [[MDCalendar alloc]
       initWithFrame:CGRectMake(0, _headerHeight.floatValue, self.mdWidth,
                                self.mdHeight - _headerHeight.floatValue)];
