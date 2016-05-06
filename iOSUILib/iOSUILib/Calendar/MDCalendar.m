@@ -331,6 +331,9 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     
+    unsigned int flags = NSCalendarUnitDay | NSCalendarUnitMonth;
+    NSCalendar* calendar = [NSCalendar currentCalendar];
+    
     if (indexPath.item >= 0 && indexPath.item <= 6) {
         
         UICollectionViewCell *cell =
@@ -382,6 +385,23 @@
         // NSLog(@"cellForItemAtIndexPath %li", indexPath.item);
         
         NSDate *currentDate = [self dateForIndexPath:indexPath];
+        
+        NSMutableArray *contactIds = [@[] mutableCopy];
+        NSDateComponents* components = [calendar components:flags fromDate:currentDate];
+        NSDate* withoutYear = [calendar dateFromComponents:components];
+        NSArray *datesVals = _shortDatesDict.allValues;
+        for (int i=0; i<datesVals.count; i++) {
+            NSArray *dates = datesVals[i];
+            for (NSDate *date in dates) {
+                if ([date isEqualToDate:withoutYear]) {
+                    [contactIds addObjectsFromArray:[_shortDatesDict allKeysForObject:dates]];
+                }
+            }
+        }
+        
+        if (contactIds.count>0) {
+            cell.contactsIds=contactIds;
+        }
         
         cell.titleColors = self.titleColors;
         cell.backgroundColors = self.backgroundColors;

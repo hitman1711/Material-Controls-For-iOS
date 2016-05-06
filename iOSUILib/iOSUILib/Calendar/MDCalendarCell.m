@@ -155,16 +155,21 @@
     _titleLabel.text = [NSString stringWithFormat:@"%@", @(_date.mdDay)];
     _titleLabel.textColor = [self colorForCurrentStateInDictionary:_titleColors];
     _titleLabel.hidden = self.isPlaceholder && !self.showPlaceholder;
-    _backgroundLayer.fillColor =
-    [self colorForCurrentStateInDictionary:_backgroundColors].CGColor;
+    if (_contactsIds && _contactsIds.count>0) {
+        _backgroundLayer.fillColor = [UIColor redColor].CGColor;
+    } else {
+        _backgroundLayer.fillColor =
+        [self colorForCurrentStateInDictionary:_backgroundColors].CGColor;
+    }
     _selectedBackgroundLayer.fillColor = [UIColor colorWithRed:169./255. green:238./255. blue:253./255. alpha:1.].CGColor;
+    
     
     _titleLabel.frame = CGRectMake(0, (2 + _backgroundLayer.frame.size.height/2 - (_titleLabel.font.lineHeight/2)), self.mdWidth, _titleLabel.font.lineHeight);//CGRectMake(0, 0, self.mdWidth, _titleLabel.font.lineHeight);
     
     
                                   // floor(self.contentView.mdHeight * 4.0 / 6.0));
     
-    _backgroundLayer.hidden = !self.selected && !self.isToday;
+    _backgroundLayer.hidden = !self.selected && !self.isToday && !_contactsIds;
     _backgroundLayer.path =
     _cellStyle == MDCalendarCellStyleCircle
     ? [UIBezierPath bezierPathWithOvalInRect:_backgroundLayer.bounds]

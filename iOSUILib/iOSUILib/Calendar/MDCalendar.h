@@ -59,6 +59,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(weak, nonatomic) IBOutlet MDCalendarDateHeader *dateHeader;
 @property(weak, nonatomic) IBOutlet id<MDCalendarDelegate> delegate;
+
+@property (nonatomic, strong) NSMutableDictionary* shortDatesDict;
+
 @property(assign, nonatomic) BOOL showPlaceholder;
 
 @property(copy, nonatomic) NSDate *currentDate;

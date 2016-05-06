@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(weak, nonatomic) NSDictionary <NSNumber*, UIColor*>* titleColors;
 @property(weak, nonatomic) NSDictionary <NSNumber*, UIColor*>* backgroundColors;
 
+@property(weak, nonatomic) NSArray* contactsIds;
+
 @property(copy, nonatomic) NSDate* date;
 @property(copy, nonatomic) NSDate* month;
 @property(weak, nonatomic) NSDate* currentDate;
