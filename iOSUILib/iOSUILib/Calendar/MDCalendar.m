@@ -468,6 +468,9 @@
              selectItemAtIndexPath:indexPath
              animated:NO
              scrollPosition:UICollectionViewScrollPositionNone];
+            if (cell.contactsIds) {
+                [_eventsDelegate calendar:self didSelectDateWithIds:cell.contactsIds];
+            }
         }
         NSDate *date = [self dateForIndexPath:indexPath];
         [cell showAnimation];

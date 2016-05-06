@@ -50,6 +50,11 @@ typedef NS_ENUM(NSInteger, MDCalendarTheme) {
 };
 
 NS_ASSUME_NONNULL_BEGIN
+
+@protocol MDCalendarEventsDelegate <NSObject>
+- (void)calendar:(MDCalendar *)calendar didSelectDateWithIds:(NSArray*)ids;
+@end
+
 @protocol MDCalendarDelegate <NSObject>
 @required
 - (void)calendar:(MDCalendar *)calendar didSelectDate:(nullable NSDate *)date;
@@ -59,6 +64,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(weak, nonatomic) IBOutlet MDCalendarDateHeader *dateHeader;
 @property(weak, nonatomic) IBOutlet id<MDCalendarDelegate> delegate;
+
+@property(weak, nonatomic) id<MDCalendarEventsDelegate> eventsDelegate;
 
 @property (nonatomic, strong) NSMutableDictionary* shortDatesDict;
 
