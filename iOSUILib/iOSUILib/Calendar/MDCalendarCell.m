@@ -115,7 +115,7 @@
 
 - (void)showAnimation {
     _backgroundLayer.hidden = NO;
-    _selectedBackgroundLayer.hidden = !(self.isToday && !self.isPlaceholder);
+    _selectedBackgroundLayer.hidden = !((self.isToday || _contactsIds) && !self.isPlaceholder);
     
     _backgroundLayer.path =
     [UIBezierPath bezierPathWithOvalInRect:_backgroundLayer.bounds].CGPath;
@@ -123,7 +123,13 @@
     
     _backgroundLayer.fillColor =
     [self colorForCurrentStateInDictionary:_backgroundColors].CGColor;
-    _selectedBackgroundLayer.fillColor = [UIColor colorWithRed:169./255. green:238./255. blue:253./255. alpha:1.].CGColor;
+    
+    if (_contactsIds && _contactsIds.count>0) {
+        _selectedBackgroundLayer.fillColor = [UIColor redColor].CGColor;
+    } else {
+        _selectedBackgroundLayer.fillColor = [UIColor colorWithRed:169./255. green:238./255. blue:253./255. alpha:1.].CGColor;
+    }
+
     
     CAAnimationGroup *group = [CAAnimationGroup animation];
     CABasicAnimation *zoomOut =
