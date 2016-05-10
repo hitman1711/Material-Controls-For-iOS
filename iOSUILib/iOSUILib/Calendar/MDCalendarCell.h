@@ -43,6 +43,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property(readonly, getter=isPlaceholder) BOOL placeholder;
 @property(assign, getter=isShowPlaceholder) BOOL showPlaceholder;
 
+-(void)animateEventTapped;
+-(void)animateTodayWithEmptyTapped;
+
 - (void)showAnimation;
 - (void)hideAnimation;
 - (void)configureCell;

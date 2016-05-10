@@ -116,21 +116,43 @@ static CGColorRef eventColor = nil;
     [self configureCell];
 }
 
+-(void)animateEventTapped{
+    _selectedBackgroundLayer.hidden = !(_contactsIds && !self.isPlaceholder);
+    _selectedBackgroundLayer.path =  [UIBezierPath bezierPathWithOvalInRect:_selectedBackgroundLayer.bounds].CGPath;
+    _selectedBackgroundLayer.fillColor = eventColor;
+    [_selectedBackgroundLayer addAnimation:[self generalAnimationGroup] forKey:@"bounce"];
+}
+
+-(void)animateTodayWithEmptyTapped{
+    _backgroundLayer.hidden = NO;
+    _backgroundLayer.path =
+    [UIBezierPath bezierPathWithOvalInRect:_backgroundLayer.bounds].CGPath;
+    _backgroundLayer.fillColor = [self colorForCurrentStateInDictionary:_backgroundColors].CGColor;
+    [_backgroundLayer addAnimation:[self generalAnimationGroup] forKey:@"bounce"];
+}
+
+
 - (void)showAnimation {
     _backgroundLayer.hidden = NO;
     _selectedBackgroundLayer.hidden = !(_contactsIds && !self.isPlaceholder);
+    
     //!((self.isToday || _contactsIds) && !self.isPlaceholder);
     
     _backgroundLayer.path =
     [UIBezierPath bezierPathWithOvalInRect:_backgroundLayer.bounds].CGPath;
     _selectedBackgroundLayer.path =  [UIBezierPath bezierPathWithOvalInRect:_selectedBackgroundLayer.bounds].CGPath;
     
-    _backgroundLayer.fillColor =
-    [self colorForCurrentStateInDictionary:_backgroundColors].CGColor;
+    _backgroundLayer.fillColor = [self colorForCurrentStateInDictionary:_backgroundColors].CGColor;
     
     _selectedBackgroundLayer.fillColor = eventColor;
     
     
+    [_backgroundLayer addAnimation:[self generalAnimationGroup] forKey:@"bounce"];
+    [_selectedBackgroundLayer addAnimation:[self generalAnimationGroup] forKey:@"bounce"];
+    [self configureCell];
+}
+
+-(CAAnimationGroup*)generalAnimationGroup{
     CAAnimationGroup *group = [CAAnimationGroup animation];
     CABasicAnimation *zoomOut =
     [CABasicAnimation animationWithKeyPath:@"transform.scale"];
@@ -145,9 +167,7 @@ static CGColorRef eventColor = nil;
     zoomIn.duration = kAnimationDuration / 4;
     group.duration = kAnimationDuration;
     group.animations = @[ zoomOut, zoomIn ];
-    [_backgroundLayer addAnimation:group forKey:@"bounce"];
-    [_selectedBackgroundLayer addAnimation:group forKey:@"bounce"];
-    [self configureCell];
+    return group;
 }
 
 - (void)hideAnimation {

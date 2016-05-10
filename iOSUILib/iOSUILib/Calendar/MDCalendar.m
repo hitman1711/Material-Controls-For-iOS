@@ -485,8 +485,20 @@
 - (BOOL)collectionView:(UICollectionView *)collectionView
     shouldSelectItemAtIndexPath:(nonnull NSIndexPath *)indexPath;
 {
-  NSDate *date = [self dateForIndexPath:indexPath];
-    BOOL shouldSelect = [self shouldSelectDate:date];
+    NSDate *date = [self dateForIndexPath:indexPath];
+    
+    MDCalendarCell *cell =
+    (MDCalendarCell *)[collectionView cellForItemAtIndexPath:indexPath];
+    BOOL shouldSelect = NO;
+    
+    if (cell.contactsIds) {
+        [cell animateEventTapped];
+        shouldSelect=NO;
+        [_eventsDelegate calendar:self didSelectDateWithIds:cell.contactsIds];
+    } else if (cell.isToday && [self shouldSelectDate:date]) {
+        shouldSelect = YES;
+    }
+    
     NSLog(@"Should select:%@\n?:%i",date,shouldSelect);
     return shouldSelect;
 }
@@ -498,9 +510,9 @@
   }
   MDCalendarCell *cell =
       (MDCalendarCell *)[collectionView cellForItemAtIndexPath:indexPath];
-    if (cell.isToday) {
+//    if (cell.isToday) {
         [cell hideAnimation];
-    }
+//    }
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
