@@ -331,8 +331,9 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     
-    unsigned int flags = NSCalendarUnitDay | NSCalendarUnitMonth;
-    NSCalendar* calendar = [NSCalendar currentCalendar];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"dd.MM"];
+    
     
     if (indexPath.item >= 0 && indexPath.item <= 6) {
         
@@ -385,23 +386,23 @@
         // NSLog(@"cellForItemAtIndexPath %li", indexPath.item);
         
         NSDate *currentDate = [self dateForIndexPath:indexPath];
+        NSString *currentShortDate = [dateFormatter stringFromDate:currentDate];
+        
+        NSArray *allShortDates = [_shortDatesDict allKeys];
+        
         
         NSMutableArray *contactIds = [@[] mutableCopy];
-        NSDateComponents* components = [calendar components:flags fromDate:currentDate];
-        NSDate* withoutYear = [calendar dateFromComponents:components];
-        NSArray *datesVals = _shortDatesDict.allValues;
-        for (int i=0; i<datesVals.count; i++) {
-            NSArray *dates = datesVals[i];
-            for (NSDate *date in dates) {
-                if ([date isEqualToDate:withoutYear]) {
-                    [contactIds addObjectsFromArray:[_shortDatesDict allKeysForObject:dates]];
-                }
+        
+        for (int i=0; i<allShortDates.count; i++) {
+            NSString *iShortDateStr = allShortDates[i];
+            if ([iShortDateStr isEqualToString:currentShortDate]) {
+                cell.contactsIds=[_shortDatesDict valueForKey:iShortDateStr];
             }
         }
         
-        if (contactIds.count>0) {
-            cell.contactsIds=contactIds;
-        }
+//        if (contactIds.count>0) {
+//            cell.contactsIds=contactIds;
+//        }
         
         cell.titleColors = self.titleColors;
         cell.backgroundColors = self.backgroundColors;
