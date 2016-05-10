@@ -391,18 +391,18 @@
         NSArray *allShortDates = [_shortDatesDict allKeys];
         
         
-        NSMutableArray *contactIds = [@[] mutableCopy];
-        
+        BOOL hasDate = NO;
         for (int i=0; i<allShortDates.count; i++) {
             NSString *iShortDateStr = allShortDates[i];
             if ([iShortDateStr isEqualToString:currentShortDate]) {
+                hasDate = YES;
                 cell.contactsIds=[_shortDatesDict valueForKey:iShortDateStr];
+                break;
             }
         }
-        
-//        if (contactIds.count>0) {
-//            cell.contactsIds=contactIds;
-//        }
+        if (!hasDate) {
+            cell.contactsIds = nil;
+        }
         
         cell.titleColors = self.titleColors;
         cell.backgroundColors = self.backgroundColors;
