@@ -47,5 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)hideAnimation;
 - (void)configureCell;
 
+- (BOOL)isToday;
+
 @end
 NS_ASSUME_NONNULL_END

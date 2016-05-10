@@ -498,7 +498,9 @@
   }
   MDCalendarCell *cell =
       (MDCalendarCell *)[collectionView cellForItemAtIndexPath:indexPath];
-  [cell hideAnimation];
+    if (cell.isToday) {
+        [cell hideAnimation];
+    }
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {

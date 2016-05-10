@@ -28,6 +28,8 @@
 
 #define kAnimationDuration 0.15
 
+static CGColorRef eventColor = nil;
+
 @interface MDCalendarCell ()
 
 @property(strong, nonatomic) CAShapeLayer *selectedBackgroundLayer;
@@ -62,9 +64,10 @@
         
         _backgroundLayer = [CAShapeLayer layer];
         _backgroundLayer.backgroundColor = [UIColor clearColor].CGColor;
-        _backgroundLayer.hidden = YES;
+        _backgroundLayer.hidden = !(self.isToday && !self.isPlaceholder);
         [self.contentView.layer insertSublayer:_backgroundLayer atIndex:0];
         
+        eventColor = [UIColor colorWithRed:169./255. green:238./255. blue:253./255. alpha:1.].CGColor;
         _selectedBackgroundLayer = [CAShapeLayer layer];
         _selectedBackgroundLayer.backgroundColor = [UIColor clearColor].CGColor;
         _selectedBackgroundLayer.hidden = YES;
@@ -115,7 +118,8 @@
 
 - (void)showAnimation {
     _backgroundLayer.hidden = NO;
-    _selectedBackgroundLayer.hidden = !((self.isToday || _contactsIds) && !self.isPlaceholder);
+    _selectedBackgroundLayer.hidden = !(_contactsIds && !self.isPlaceholder);
+    //!((self.isToday || _contactsIds) && !self.isPlaceholder);
     
     _backgroundLayer.path =
     [UIBezierPath bezierPathWithOvalInRect:_backgroundLayer.bounds].CGPath;
@@ -124,12 +128,8 @@
     _backgroundLayer.fillColor =
     [self colorForCurrentStateInDictionary:_backgroundColors].CGColor;
     
-    if (_contactsIds && _contactsIds.count>0) {
-        _selectedBackgroundLayer.fillColor = [UIColor redColor].CGColor;
-    } else {
-        _selectedBackgroundLayer.fillColor = [UIColor colorWithRed:169./255. green:238./255. blue:253./255. alpha:1.].CGColor;
-    }
-
+    _selectedBackgroundLayer.fillColor = eventColor;
+    
     
     CAAnimationGroup *group = [CAAnimationGroup animation];
     CABasicAnimation *zoomOut =
@@ -162,11 +162,9 @@
     _titleLabel.textColor = [self colorForCurrentStateInDictionary:_titleColors];
     _titleLabel.hidden = self.isPlaceholder && !self.showPlaceholder;
     
-    if (_contactsIds && _contactsIds.count>0) {
-        _selectedBackgroundLayer.fillColor = [UIColor redColor].CGColor;
-    } else {
-        _selectedBackgroundLayer.fillColor = [UIColor colorWithRed:169./255. green:238./255. blue:253./255. alpha:1.].CGColor;
-    }
+    
+    _selectedBackgroundLayer.fillColor = eventColor;
+    
     _backgroundLayer.fillColor =
     [self colorForCurrentStateInDictionary:_backgroundColors].CGColor;
 
@@ -184,7 +182,7 @@
     .CGPath
     : [UIBezierPath bezierPathWithRect:_backgroundLayer.bounds].CGPath;
     
-    _selectedBackgroundLayer.hidden = !((self.isToday || _contactsIds) && !self.isPlaceholder);
+    _selectedBackgroundLayer.hidden = !(_contactsIds && !self.isPlaceholder);
     _selectedBackgroundLayer.path =  [UIBezierPath bezierPathWithOvalInRect:_selectedBackgroundLayer.bounds].CGPath;
     
 }
