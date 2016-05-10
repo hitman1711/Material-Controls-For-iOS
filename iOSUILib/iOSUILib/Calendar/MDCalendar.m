@@ -145,7 +145,7 @@
 
   _cellStyle = MDCalendarCellStyleCircle;
 
-  self.minimumDate = [NSDateHelper mdDateWithYear:1970 month:1 day:1];
+  self.minimumDate = [NSDateHelper mdDateWithYear:2010 month:1 day:1];
   _maximumDate = [NSDateHelper mdDateWithYear:2037 month:12 day:31];
 
   MDCalendarYearSelector *yearSelector =
@@ -531,8 +531,9 @@
   if (_isDoingLayoutSubview) {
     return;
   }
+    CGFloat cellHeight = (ISIPHONE_4 || ISIPHONE_6) ? 50 : ISIPHONE_5 ? 62.25 : 62;
     CGFloat scrollOffset =MAX(scrollView.contentOffset.x / scrollView.mdWidth,
-                         scrollView.contentOffset.y / ((56/7)*50));
+                              scrollView.contentOffset.y / ((56/7)*cellHeight));
 
     //MAX(scrollView.contentOffset.x / scrollView.mdWidth,
     //                         scrollView.contentOffset.y / scrollView.mdHeight);
@@ -670,8 +671,10 @@
     NSInteger scrollOffset = [date mdMonthsFrom:self.minimumDate];
     NSIndexPath *idxPath = [NSIndexPath indexPathForItem:0 inSection:scrollOffset];
     
+#if TARGET_IPHONE_SIMULATOR
+    NSLog(@"This is simulator mode....");
+    // Работает и на эмуляторах но хуже чем scrollTo
     if (ISIPHONE_6) {
-        //        [_collectionView scrollToItemAtIndexPath:idxPath atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
         CGFloat cellHeight = 50;
         CGFloat cellPadding = 6;
         _collectionView.bounds =
@@ -689,6 +692,13 @@
         CGRectMake(0, scrollOffset*((cellHeight*8)+cellPadding),
                    _collectionView.mdWidth, _collectionView.mdHeight);
     }
+    
+#else
+    NSLog(@"This is device mode....");
+    // Работает только на устройстве
+    [_collectionView scrollToItemAtIndexPath:idxPath atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+    
+#endif
 }
 
 - (NSDate *)dateForIndexPath:(NSIndexPath *)indexPath {

@@ -47,8 +47,8 @@
     self.itemSize = cellSize;
     self.estimatedItemSize = cellSize;
     
-    self.minimumInteritemSpacing = 0;
-    self.minimumLineSpacing = 0;
+    self.minimumInteritemSpacing = 1;
+    self.minimumLineSpacing = 1;
     self.scrollDirection = UICollectionViewScrollDirectionVertical;
     //self.sectionInset = UIEdgeInsetsMake(10.0, 10.0, 10.0, 10.0);
 }
