@@ -32,7 +32,18 @@
 
 - (void)setup
 {
-    CGSize cellSize = CGSizeMake(49, 50);
+    CGSize cellSize;
+    
+    if (ISIPHONE_4) {
+        cellSize = CGSizeMake(42,50);
+    } if (ISIPHONE_5) {
+        cellSize = CGSizeMake(42,62.25);
+    } else if (ISIPHONE_6) {
+        cellSize = CGSizeMake(49, 50);
+    } else {
+        cellSize = CGSizeMake(55, 62);//6+
+    }
+
     self.itemSize = cellSize;
     self.estimatedItemSize = cellSize;
     

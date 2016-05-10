@@ -280,9 +280,21 @@
   [super layoutSubviews];
   CGFloat padding = MIN(self.mdHeight * 0.01, self.mdWidth * 0.01);
   _collectionView.frame = CGRectMake(0, 0, self.mdWidth, self.mdHeight);
-    _collectionViewFlowLayout.itemSize = CGSizeMake((_collectionView.mdWidth - padding * 8) / 7,
-                                                   (_collectionView.mdHeight - padding * 2) / 8);//52
+    CGSize cellSize;
+    if (ISIPHONE_4) {
+        cellSize = CGSizeMake(42,50);
+    } if (ISIPHONE_5) {
+        cellSize = CGSizeMake(42,62.25);
+    } else if (ISIPHONE_6) {
+        cellSize = CGSizeMake(49, 50);
+    } else {
+        cellSize = CGSizeMake(55, 62);//6+
+    }
 
+    _collectionViewFlowLayout.itemSize = cellSize;
+    
+//    CGSizeMake((_collectionView.mdWidth - padding * 8) / 7,
+//                                                   (_collectionView.mdHeight - padding * 2) / 8);//52
 //      CGSizeMake((_collectionView.mdWidth - padding * 8) / 7,
 //                 (_collectionView.mdHeight - padding * 2) / 7);
     //  was divided by 8
@@ -655,12 +667,28 @@
 #pragma mark - Private
 
 - (void)scrollToDate:(NSDate *)date {
-  NSInteger scrollOffset = [date mdMonthsFrom:self.minimumDate];
-  NSIndexPath *idxPath = [NSIndexPath indexPathForItem:0 inSection:scrollOffset];
-    [_collectionView scrollToItemAtIndexPath:idxPath atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
-//  _collectionView.bounds =
-//      CGRectMake(0, scrollOffset * _collectionView.mdHeight,
-//                 _collectionView.mdWidth, _collectionView.mdHeight);
+    NSInteger scrollOffset = [date mdMonthsFrom:self.minimumDate];
+    NSIndexPath *idxPath = [NSIndexPath indexPathForItem:0 inSection:scrollOffset];
+    
+    if (ISIPHONE_6) {
+        //        [_collectionView scrollToItemAtIndexPath:idxPath atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+        CGFloat cellHeight = 50;
+        CGFloat cellPadding = 6;
+        _collectionView.bounds =
+        CGRectMake(0, scrollOffset*((cellHeight*8)+cellPadding),
+                   _collectionView.mdWidth, _collectionView.mdHeight);
+    } else if (ISIPHONE_5 || ISIPHONE_4) {
+        _collectionView.bounds =
+        CGRectMake(0, scrollOffset * _collectionView.mdHeight,
+                   _collectionView.mdWidth, _collectionView.mdHeight);
+    } else {
+        //        CGSize sSize = [ [ UIScreen mainScreen ] bounds ].size;
+        CGFloat cellHeight = 62;
+        CGFloat cellPadding = 6;
+        _collectionView.bounds =
+        CGRectMake(0, scrollOffset*((cellHeight*8)+cellPadding),
+                   _collectionView.mdWidth, _collectionView.mdHeight);
+    }
 }
 
 - (NSDate *)dateForIndexPath:(NSIndexPath *)indexPath {
