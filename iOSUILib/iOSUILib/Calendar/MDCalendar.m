@@ -382,23 +382,32 @@
         // NSLog(@"cellForItemAtIndexPath %li", indexPath.item);
         
         NSDate *currentDate = [self dateForIndexPath:indexPath];
-        NSString *currentShortDate = [dateFormatter stringFromDate:currentDate];
+        
+        NSString *currentShortDate = [self shortTextStringFormDate:currentDate];
+        NSString *currentDateString = [self textStringFormDate:currentDate];
         
         NSArray *allShortDates = [_shortDatesDict allKeys];
         
+        NSMutableArray *idsTempArray = [NSMutableArray new];
         
+        BOOL isAnnual = YES;
         BOOL hasDate = NO;
         for (int i=0; i<allShortDates.count; i++) {
-            NSString *iShortDateStr = allShortDates[i];
-            if ([iShortDateStr isEqualToString:currentShortDate]) {
+            NSString *iDateStr = allShortDates[i];
+            isAnnual = iDateStr.length<=5 ? YES : NO;
+            NSString *appropriateDateString = isAnnual ? currentShortDate : currentDateString;
+            
+            if ([iDateStr isEqualToString:appropriateDateString]) {
                 hasDate = YES;
-                cell.contactsIds=[_shortDatesDict valueForKey:iShortDateStr];
-                break;
+                [idsTempArray addObjectsFromArray:[_shortDatesDict valueForKey:iDateStr]];
             }
         }
-        if (!hasDate) {
+        if (hasDate) {
+            cell.contactsIds = idsTempArray;
+        } else {
             cell.contactsIds = nil;
         }
+
         
         cell.titleColors = self.titleColors;
         cell.backgroundColors = self.backgroundColors;
@@ -413,6 +422,30 @@
         
     }
 }
+
+- (NSString*)shortTextStringFormDate:(NSDate*)date
+{
+    static NSDateFormatter *shortTextFormatter;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        shortTextFormatter = [[NSDateFormatter alloc] init];
+        [shortTextFormatter setDateFormat:@"dd.MM"];
+    });
+    return [shortTextFormatter stringFromDate:date];
+}
+
+- (NSString*)textStringFormDate:(NSDate*)date
+{
+    static NSDateFormatter *shortTextFormatter;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        shortTextFormatter = [[NSDateFormatter alloc] init];
+        [shortTextFormatter setDateFormat:@"dd.MM.yyyy"];
+    });
+    return [shortTextFormatter stringFromDate:date];
+}
+
+
 
 -(void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     
