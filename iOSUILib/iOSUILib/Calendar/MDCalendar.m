@@ -320,8 +320,8 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section {
-  // NSLog(@"collectionView numberOfItemsInSection %li", section);
-  return 56; // 42 + (rand() % 3) * 7;
+  
+  return 56;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
@@ -516,6 +516,9 @@
 {
     NSDate *date = [self dateForIndexPath:indexPath];
     
+    if ([[collectionView cellForItemAtIndexPath:indexPath] isMemberOfClass:[UICollectionViewCell class]]) {
+        return NO;
+    }
     MDCalendarCell *cell =
     (MDCalendarCell *)[collectionView cellForItemAtIndexPath:indexPath];
     BOOL shouldSelect = NO;
@@ -524,7 +527,7 @@
         [cell animateEventTapped];
         shouldSelect=NO;
         [_eventsDelegate calendar:self didSelectDateWithIds:cell.contactsIds];
-    } else if (cell.isToday && [self shouldSelectDate:date]) {
+    } else if (cell.isToday && !cell.isPlaceholder) {
         shouldSelect = YES;
     }
     
