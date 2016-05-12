@@ -369,7 +369,7 @@
             [cell.contentView addSubview:titleLabel];
         }
         // titleLabel.mdWidth = self.mdWidth;
-        _dateHeader.dateFormatter.dateFormat = @"LLLL";
+        _dateHeader.dateFormatter.dateFormat = @"LLLL yyyy";
         titleLabel.text = [[_dateHeader.dateFormatter
                             stringFromDate:[self.minimumDate
                                             mdDateByAddingMonths:indexPath.section]] uppercaseString];
