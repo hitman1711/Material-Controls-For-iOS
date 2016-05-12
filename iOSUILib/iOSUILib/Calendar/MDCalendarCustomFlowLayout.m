@@ -20,43 +20,15 @@
     return self;
 }
 
-- (id)initWithCoder:(NSCoder *)aDecoder
-{
-    self = [super init];
-    if (self) {
-        [self setup];
-    }
-    
-    return self;
-}
 
 - (void)setup
 {
-    CGSize cellSize;
-    
-    if (ISIPHONE_4) {
-        cellSize = CGSizeMake(42,50);
-    } if (ISIPHONE_5) {
-        cellSize = CGSizeMake(42,62.25);
-    } else if (ISIPHONE_6) {
-        cellSize = CGSizeMake(49, 50);
-    } else {
-        cellSize = CGSizeMake(55, 62);//6+
-    }
-
-    self.itemSize = cellSize;
-    self.estimatedItemSize = cellSize;
-    
-    self.minimumInteritemSpacing = 1;
-    self.minimumLineSpacing = 1;
+    self.headerReferenceSize = CGSizeMake(0, 0);
+    self.minimumInteritemSpacing = 0;
+    self.minimumLineSpacing = 0;
     self.scrollDirection = UICollectionViewScrollDirectionVertical;
-    //self.sectionInset = UIEdgeInsetsMake(10.0, 10.0, 10.0, 10.0);
 }
 
-- (void)awakeFromNib
-{
-    [self setup];
-}
 
 //- (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset withScrollingVelocity:(CGPoint)velocity {
 //    

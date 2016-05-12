@@ -41,7 +41,7 @@
 
 @interface MDCalendar () <UICollectionViewDataSource, UICollectionViewDelegate,
                           MDCalendarDateHeaderDelegate,
-                          MDCalendarYearSelectorDelegate>
+                          MDCalendarYearSelectorDelegate,UICollectionViewDelegateFlowLayout>
 
 @property(strong, nonatomic) NSArray *weekdays;
 
@@ -278,41 +278,25 @@
   _dateHeader.dateFormatter.dateFormat = @"dd-MM-yyyy";
 
   [super layoutSubviews];
-  CGFloat padding = MIN(self.mdHeight * 0.01, self.mdWidth * 0.01);
   _collectionView.frame = CGRectMake(0, 0, self.mdWidth, self.mdHeight);
-    CGSize cellSize;
-    if (ISIPHONE_4) {
-        cellSize = CGSizeMake(42,50);
-    } if (ISIPHONE_5) {
-        cellSize = CGSizeMake(42,62.25);
-    } else if (ISIPHONE_6) {
-        cellSize = CGSizeMake(49, 50);
-    } else {
-        cellSize = CGSizeMake(55, 62);//6+
-    }
-
-    _collectionViewFlowLayout.itemSize = cellSize;
-    
-//    CGSizeMake((_collectionView.mdWidth - padding * 8) / 7,
-//                                                   (_collectionView.mdHeight - padding * 2) / 8);//52
-//      CGSizeMake((_collectionView.mdWidth - padding * 8) / 7,
-//                 (_collectionView.mdHeight - padding * 2) / 7);
-    //  was divided by 8
-  _collectionViewFlowLayout.sectionInset =
-      UIEdgeInsetsMake(padding, 0, padding, 0);
+  [self.collectionView setContentInset:UIEdgeInsetsMake(0, 0, 0, 0)];
 
   _yearSelector.frame = _collectionView.frame;
 
   [self reloadData];
   [self.yearSelector relayout];
-
   _dateHeader.dateFormatter.dateFormat = @"dd-MM-yyyy";
-  NSInteger montnsFrom = [_currentDate mdMonthsFrom:self.minimumDate] + 1;
-//    [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:montnsFrom] atScrollPosition:UICollectionViewScrollPositionCenteredVertically animated:NO];
-    
   [self scrollToDate:currentDate];
   _isDoingLayoutSubview = NO;
 }
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    CGFloat itemWidth = floorf(CGRectGetWidth(self.collectionView.bounds) / 7);
+    CGFloat itemHeight = (ISIPHONE_4 || ISIPHONE_6) ? 50 : 62;
+    return CGSizeMake(itemWidth, itemHeight);
+}
+
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(id)object
@@ -531,9 +515,9 @@
   if (_isDoingLayoutSubview) {
     return;
   }
-    CGFloat cellHeight = (ISIPHONE_4 || ISIPHONE_6) ? 50 : ISIPHONE_5 ? 62.25 : 62;
+    CGFloat itemHeight = (ISIPHONE_4 || ISIPHONE_6) ? 50 : 62;
     CGFloat scrollOffset =MAX(scrollView.contentOffset.x / scrollView.mdWidth,
-                              scrollView.contentOffset.y / ((56/7)*cellHeight));
+                              scrollView.contentOffset.y / ((56/7)*itemHeight));
 
     //MAX(scrollView.contentOffset.x / scrollView.mdWidth,
     //                         scrollView.contentOffset.y / scrollView.mdHeight);
@@ -667,38 +651,28 @@
 
 #pragma mark - Private
 
-- (void)scrollToDate:(NSDate *)date {
-    NSInteger scrollOffset = [date mdMonthsFrom:self.minimumDate];
-    NSIndexPath *idxPath = [NSIndexPath indexPathForItem:0 inSection:scrollOffset];
-    
-#if TARGET_IPHONE_SIMULATOR
-    NSLog(@"This is simulator mode....");
-    // Работает и на эмуляторах но хуже чем scrollTo
-    if (ISIPHONE_6) {
-        CGFloat cellHeight = 50;
-        CGFloat cellPadding = 6;
-        _collectionView.bounds =
-        CGRectMake(0, scrollOffset*((cellHeight*8)+cellPadding),
-                   _collectionView.mdWidth, _collectionView.mdHeight);
-    } else if (ISIPHONE_5 || ISIPHONE_4) {
-        _collectionView.bounds =
-        CGRectMake(0, scrollOffset * _collectionView.mdHeight,
-                   _collectionView.mdWidth, _collectionView.mdHeight);
-    } else {
-        //        CGSize sSize = [ [ UIScreen mainScreen ] bounds ].size;
-        CGFloat cellHeight = 62;
-        CGFloat cellPadding = 6;
-        _collectionView.bounds =
-        CGRectMake(0, scrollOffset*((cellHeight*8)+cellPadding),
-                   _collectionView.mdWidth, _collectionView.mdHeight);
+- (void)scrollToDate:(NSDate *)date
+{
+    @try {
+        //NSIndexPath *selectedDateIndexPath = [self indexPathForCellAtDate:date];
+        NSInteger scrollOffset = [date mdMonthsFrom:self.minimumDate];
+        NSIndexPath *selectedDateIndexPath = [NSIndexPath indexPathForItem:0 inSection:scrollOffset];
+        
+        if (![[self.collectionView indexPathsForVisibleItems] containsObject:selectedDateIndexPath]) {
+            
+            UICollectionViewLayoutAttributes *sectionLayoutAttributes = [self.collectionView layoutAttributesForItemAtIndexPath:selectedDateIndexPath];
+            CGPoint origin = sectionLayoutAttributes.frame.origin;
+            origin.x = 0;
+            //origin.y -= (PDTSimpleCalendarFlowLayoutInsetTop + self.collectionView.contentInset.top);
+            [self.collectionView setContentOffset:origin animated:NO];
+        }
     }
-    
-#else
-    NSLog(@"This is device mode....");
-    // Работает только на устройстве
-    [_collectionView scrollToItemAtIndexPath:idxPath atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
-    
-#endif
+    @catch (NSException *exception) {
+        //Exception occured (it should not according to the documentation, but in reality...) let's scroll to the IndexPath then
+        NSInteger section = [date mdMonthsFrom:self.minimumDate];
+        NSIndexPath *sectionIndexPath = [NSIndexPath indexPathForItem:0 inSection:section];
+        [self.collectionView scrollToItemAtIndexPath:sectionIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+    }
 }
 
 - (NSDate *)dateForIndexPath:(NSIndexPath *)indexPath {
